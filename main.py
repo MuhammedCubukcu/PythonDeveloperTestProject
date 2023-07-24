@@ -2,7 +2,6 @@ import csv
 from selenium.webdriver.common.by import By
 import Database.MongoDb as mongo_db
 from selenium import webdriver
-import pandas as pd
 import time
 import numpy as np
 
@@ -10,10 +9,10 @@ import numpy as np
 
 # KİTAP YURDU
 
-
 driver = webdriver.Chrome()
 driver.get('https://www.kitapyurdu.com/')
 
+# Select Item
 select_search_input = driver.find_element(By.CSS_SELECTOR, 'input#search-input')
 select_search_input.send_keys('python')
 
@@ -26,7 +25,7 @@ select_on_sale.click()
 select_next_page = driver.find_element(By.XPATH, f"/html//div[@id='content']/div[@class='grid_9']//div[@class='links']/a[1]")
 
 
-
+# Get values and Edit values
 books = []
 update_books = []
 slice_books = []
@@ -74,108 +73,61 @@ for i in range(20):
 for i in range(20):
     update_db[i].update(prices[i])
 
-print(update_db)
+
 
 """
 for value in update_db:
     mongo_db.col_name_kitap_yurdu.insert_one(value)
 """
 
-# Kitap sepeti
+# kitap sepeti
 
-kitap_sepeti = 'https://www.kitapsepeti.com/'
-driver = webdriver.Firefox()
-driver.get(kitap_sepeti)
+driver.get('https://www.kitapsepeti.com/')
+# Select Item
+selected_input_search = driver.find_element(By.CSS_SELECTOR, "input#live-search")
+selected_input_search.send_keys('python')
 
-selected_html_element_input_search = driver.find_element(By.ID, 'live-search')
-selected_html_element_input_search.send_keys('python')
+selected_input_search_button = driver.find_element(By.CSS_SELECTOR, "input#searchBtn")
+selected_input_search_button.click()
 
-# select search button
-selected_html_element_search_btn = driver.find_element(By.ID, 'searchBtn')
-selected_html_element_search_btn.click()
-
-
-selected_html_element_on_sale = driver.find_element(By.XPATH, "//label[@for='stock']")
-selected_html_element_on_sale.click()
+driver.find_element(By.XPATH, "/html//div[@id='filtreStock']/div[@class='row stoktakiler']//label/span/i[1]").click()
 
 
-# title array
-books_title = []
-update_title = []
-# select title
-selected_html_element_title = driver.find_elements(By.CLASS_NAME, 'detailLink')
-# get title value
-for title in selected_html_element_title:
-    books_title.append(title.text)
+# Get values and Edit values
+kitap_sepeti_books = []
+kitap_sepeti_update_books = []
+strs_1 = [f"{x}" for x in range(1,55)]
+for i in strs_1:
+    selected_books = driver.find_elements(By.XPATH, f"/html//div[@id='katalog']/div[@class='col col-12 p-left']/div/div/div[{i}]/div")
+    for value in selected_books:
+        kitap_sepeti_books.append(value.text)
 
-# delete empty value title
-for title in books_title:
-    if title != "":
-        update_title.append(title)
-update_title.pop(0)
+for i in range(len(kitap_sepeti_books)):
+    value = kitap_sepeti_books[i].split('\n')
+    kitap_sepeti_update_books.append(value)
 
+kitap_sepeti_books.clear()
 
-# publisher array
-publishers = []
-update_publishers = []
-# select get title
-selected_html_element_publisher = driver.find_elements(By.CLASS_NAME, 'text-title')
-for publisher in selected_html_element_publisher:
-    publishers.append(publisher.text)
-
-
-# writers array
-writers = []
-update_writers = []
-# select writers
-selected_html_element_writers = driver.find_elements(By.ID, 'productModelText')
-for author in selected_html_element_writers:
-    writers.append(author.text)
-# delete empty value writers
-for author in writers:
-    if author != "":
-        update_writers.append(author)
-
-# Author values were on the agenda at the publisher. I deleted the authors values to clean up the array.
-for value in writers:
-    publishers.remove(value)
-
-# delete empty value publisher
-for publisher in publishers:
-    if publisher != "":
-        update_publishers.append(publisher)
-
-
-prices = []
-update_prices = []
-selected_html_element_price = driver.find_elements(By.CLASS_NAME, 'currentPrice')
-for price in selected_html_element_price:
-    prices.append(price.text)
-
-for price in prices:
-    if price != "":
-        update_prices.append(price)
-
-# slicing process
-update_title = update_title[0:54]
-update_publishers = update_publishers[0:54]
-update_writers = update_writers[0:54]
-update_prices = update_prices[0:54]
+kitap_sepeti_books_dict = {}
 
 
 
-df = pd.DataFrame({"title": update_title, "publisher": update_publishers, "writer": update_writers, "price": update_prices})
+for i in range(len(kitap_sepeti_update_books)):
+    kitap_sepeti_books_dict = {
+        'title' : kitap_sepeti_update_books[i][0],
+        'publisher': kitap_sepeti_update_books[i][1],
+        'writers': kitap_sepeti_update_books[i][2],
+        'price': kitap_sepeti_update_books[i][3]
 
-df.to_csv('books.csv')
-
-
-with open('books.csv') as f:
-    read = csv.DictReader(f)
-    for row in read:
-        mongo_db.col_name.insert_one(row)
+    }
+    kitap_sepeti_books.append(kitap_sepeti_books_dict)
 
 
 
+"""
+for value in kitap_sepeti_books:
+    mongo_db.col_name.insert_one(value)
+"""
 time.sleep(10)
 
 
