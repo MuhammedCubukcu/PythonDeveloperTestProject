@@ -8,3 +8,5 @@ client = MongoClient(CONNECTION_STRING)
 db_name = client['books_db']
 # create col name
 col_name = db_name['kitap_sepeti']
+
+col_name_kitap_yurdu = db_name['kitap_yurdu']

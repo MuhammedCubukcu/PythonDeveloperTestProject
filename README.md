@@ -10,5 +10,7 @@
 ```
 docker-compose up -d
 ``` 
-<img src="Screenshot%20from%202023-07-23%2023-42-44.png"
+
+
+<img src="Screenshot%20from%202023-07-24%2005-54-31.png"
      style="margin-left:20px" />
