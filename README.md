@@ -1,3 +1,7 @@
+<img src="Screenshot%20from%202023-07-25%2002-27-45.png"
+     style="margin-left:20px" />
+
+
 # PythonDeveloperTestProject
 
 * Kitapsepeti sitesi selenium kullanarak gerekli elementleri kullandım.(Aynı işlemler kitap yurdu sitesi içinde geçerli.)
